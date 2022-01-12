@@ -22,6 +22,9 @@ public interface UserRepository extends JpaRepository<User, Long>{
 		
 		// working below line of commented code for "Or" condition
 		//List<User> findByFirstNameOrLastName(String firstName, String lastName);
-		List<User> findByFirstNameOrLastName(String firstName, String lastName);
+		
+	     //List<User> findByFirstNameOrLastNameOrPinCode(String firstName, String lastName, String pincode);
+	
+	       List<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPinCodeContainingIgnoreCase(String firstname, String lastname, String pincode);
 
 }

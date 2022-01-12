@@ -121,9 +121,18 @@ public class UserController {
 			return new ResponseEntity<>(userRepository.findByFirstNameOrLastName(firstName, lastName), HttpStatus.OK);
 		}*/
 	
-	 @GetMapping(value = "/users/firstnameorlastname")
-		public ResponseEntity<List<User>> getUsersByFirstNameOrLastname(@RequestParam String value){
-			return new ResponseEntity<>(userRepository.findByFirstNameOrLastName(value, value), HttpStatus.OK);
+	/* @GetMapping(value = "/users/firstnameorlastnameorpincode")
+		public ResponseEntity<List<User>> getUsersByFirstNameOrLastnameOrPincode(@RequestParam String value){
+			return new ResponseEntity<>(userRepository.findByFirstNameOrLastNameOrPinCode(value, value, value), HttpStatus.OK);
 		
-	 }
+	 }*/
+	
+	@GetMapping(value = "/users/search/{query}")
+	public ResponseEntity<List<User>> getUsersByFirstNameOrLastNameOrPincode(@PathVariable("query") String query){
+		//return new ResponseEntity<>(userRepository.findByFirstNameOrLastNameOrPinCodeContaining(query), HttpStatus.OK);
+		String firstname = query;
+		String lastname = query;
+		String pincode = query;
+		return new ResponseEntity<>(userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPinCodeContainingIgnoreCase(firstname, lastname, pincode), HttpStatus.OK);
+	}
 }
