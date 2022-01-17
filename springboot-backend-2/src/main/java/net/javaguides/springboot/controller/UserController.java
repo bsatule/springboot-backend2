@@ -1,10 +1,7 @@
 package net.javaguides.springboot.controller;
 
 
-import java.text.Format;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,14 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.javaguides.springboot.exception.ResourceNotFoundException;
@@ -52,17 +48,19 @@ public class UserController {
 	
 	// get user by id rest api
 	@GetMapping("/users/{id}")
+	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<User> getUserById(@PathVariable Long id) {
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
+		User user = userRepository.findById(id).get();
+				//.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
 		return ResponseEntity.ok(user);
 	}
 	
 	// update user rest api
 	@PutMapping("/users/{id}")
+	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) throws ParseException{
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
+		User user = userRepository.findById(id).get();
+				//.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
 		//Format format = new SimpleDateFormat("yyyy-MM-dd");
 		//String dateOfJoining = format.format(userDetails.getDateOfJoining());
 		//String dateOfBirth = format.format(userDetails.getDateOfBirth());
@@ -84,10 +82,11 @@ public class UserController {
 	
 	// delete employee rest api
 	@DeleteMapping("/users/{id}/{val}")
-	public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable Long id, @PathVariable Long val){
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable Long id, @PathVariable int val){
 		if(val==0) {
-			User user = userRepository.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
+			User user = userRepository.findById(id).get();
+					//.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
 			//user.setIsActive(false);
 			user.setIsActive(false);
 			User updatedUser = userRepository.save(user);
@@ -96,36 +95,15 @@ public class UserController {
 			return ResponseEntity.ok(response);
 		}
 	else {
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
+		User user = userRepository.findById(id).get();
+				//.orElseThrow(() -> new ResourceNotFoundException("User not exist with id :" + id));
 		userRepository.delete(user);
 		Map<String, Boolean> response = new HashMap<>();
 		response.put("deleted", Boolean.TRUE);
 		
 		return ResponseEntity.ok(response);
+	     }
 	}
-	}
-	
-	/* @GetMapping("/users/firstname/{firstName}")
-	public List<User> findUsersByFirstNameOrLastName(@PathVariable String firstName){
-		return userRepository.findUsersByFirstName(firstName);
-	}	*/
-	
-	   /* @GetMapping(value = "/users/firsntnameandlastname")
-		public ResponseEntity<List<User>> getUsersByFirstNameAndLastname(@RequestParam String firstName, @RequestParam String lastName){
-			return new ResponseEntity<>(userRepository.findByFirstNameAndLastName(firstName, lastName), HttpStatus.OK);
-		}*/
-	
-	  /*  @GetMapping(value = "/users/firstnameorlastname")
-		public ResponseEntity<List<User>> getUsersByFirstNameOrLastname(@RequestParam String firstName, @RequestParam String lastName){
-			return new ResponseEntity<>(userRepository.findByFirstNameOrLastName(firstName, lastName), HttpStatus.OK);
-		}*/
-	
-	/* @GetMapping(value = "/users/firstnameorlastnameorpincode")
-		public ResponseEntity<List<User>> getUsersByFirstNameOrLastnameOrPincode(@RequestParam String value){
-			return new ResponseEntity<>(userRepository.findByFirstNameOrLastNameOrPinCode(value, value, value), HttpStatus.OK);
-		
-	 }*/
 	
 	@GetMapping(value = "/users/search/{query}")
 	public ResponseEntity<List<User>> getUsersByFirstNameOrLastNameOrPincode(@PathVariable("query") String query){
